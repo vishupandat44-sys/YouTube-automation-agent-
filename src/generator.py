@@ -155,6 +155,9 @@ PRESET_TOPICS = {
     }
 }
 
+# Pre-cached tuple of topic keys for efficient random selection without list creation
+PRESET_TOPIC_KEYS = tuple(PRESET_TOPICS.keys())
+
 
 class ShortsGenerator:
     """Automated generator for 30-60 second Hindi Kids Cartoon YouTube Shorts."""
@@ -178,7 +181,7 @@ class ShortsGenerator:
                     break
 
         if not selected_key:
-            selected_key = random.choice(list(PRESET_TOPICS.keys()))
+            selected_key = random.choice(PRESET_TOPIC_KEYS)
 
         preset = PRESET_TOPICS[selected_key]
         title = custom_title if custom_title else preset["title"]
