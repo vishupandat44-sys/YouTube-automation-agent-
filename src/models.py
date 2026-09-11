@@ -70,7 +70,7 @@ class ShortsPackage:
             "thumbnail_prompt": self.thumbnail_prompt,
             "seo_title": self.seo_title,
             "seo_description": self.seo_description,
-            "seo_tags": list(self.seo_tags),
+            "seo_tags": self.seo_tags,  # Avoid unnecessary shallow copy of list
             "cta": self.cta,
         }
 
