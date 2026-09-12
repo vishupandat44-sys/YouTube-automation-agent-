@@ -178,10 +178,11 @@ class ShortsGenerator:
                     break
 
         if not selected_key:
-            selected_key = random.choice(list(PRESET_TOPICS.keys()))
+            # Use tuple of pre-existing keys to avoid constructing list(PRESET_TOPICS.keys()) repeatedly
+            selected_key = random.choice(tuple(PRESET_TOPICS.keys()))
 
         preset = PRESET_TOPICS[selected_key]
-        title = custom_title if custom_title else preset["title"]
+        title = custom_title or preset["title"]
         moral = preset["moral"]
         characters = preset["characters"]
         raw_scenes = preset["scenes_data"]
@@ -189,20 +190,20 @@ class ShortsGenerator:
         num_scenes = len(raw_scenes)
         scene_duration = round(duration / num_scenes, 1)
 
-        scenes: List[Scene] = []
-        for idx, sdata in enumerate(raw_scenes, start=1):
-            scenes.append(
-                Scene(
-                    scene_number=idx,
-                    duration_seconds=scene_duration,
-                    visual_description=sdata["visual"],
-                    ai_video_prompt=sdata["ai_prompt"],
-                    voiceover_hindi=sdata["vo_hindi"],
-                    voiceover_english=sdata["vo_eng"],
-                    music_sfx=sdata["sfx"],
-                    subtitles=sdata["subtitles"]
-                )
+        # Optimize scene instantiation with list comprehension
+        scenes: List[Scene] = [
+            Scene(
+                scene_number=idx,
+                duration_seconds=scene_duration,
+                visual_description=sdata["visual"],
+                ai_video_prompt=sdata["ai_prompt"],
+                voiceover_hindi=sdata["vo_hindi"],
+                voiceover_english=sdata["vo_eng"],
+                music_sfx=sdata["sfx"],
+                subtitles=sdata["subtitles"]
             )
+            for idx, sdata in enumerate(raw_scenes, start=1)
+        ]
 
         main_char = characters[0].name if characters else "Cartoon Character"
         thumbnail_prompt = (
