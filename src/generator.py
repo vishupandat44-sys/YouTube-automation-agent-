@@ -155,6 +155,9 @@ PRESET_TOPICS = {
     }
 }
 
+# Pre-calculate tuple of topic keys to avoid allocating a new list on every random topic pick.
+_PRESET_KEYS = tuple(PRESET_TOPICS.keys())
+
 
 class ShortsGenerator:
     """Automated generator for 30-60 second Hindi Kids Cartoon YouTube Shorts."""
@@ -172,13 +175,18 @@ class ShortsGenerator:
         selected_key = None
         if topic:
             topic_clean = topic.lower().strip()
-            for key in PRESET_TOPICS:
-                if key in topic_clean or topic_clean in key:
-                    selected_key = key
-                    break
+            # Fast path O(1) dict lookup for exact topic matches
+            if topic_clean in PRESET_TOPICS:
+                selected_key = topic_clean
+            else:
+                for key in PRESET_TOPICS:
+                    if key in topic_clean or topic_clean in key:
+                        selected_key = key
+                        break
 
         if not selected_key:
-            selected_key = random.choice(list(PRESET_TOPICS.keys()))
+            # Use precomputed tuple instead of list(PRESET_TOPICS.keys()) allocation
+            selected_key = random.choice(_PRESET_KEYS)
 
         preset = PRESET_TOPICS[selected_key]
         title = custom_title if custom_title else preset["title"]
