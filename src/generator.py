@@ -156,6 +156,20 @@ PRESET_TOPICS = {
 }
 
 
+_PRESET_KEYS = tuple(PRESET_TOPICS.keys())
+_BASE_SEO_TAGS = [
+    "Kids Cartoons",
+    "Hindi Kahaniya",
+    "Moral Stories",
+    "YouTube Shorts",
+    "3D Animation",
+    "Educational Shorts",
+    "Bedtime Stories",
+    "Children Stories",
+    "Hindi Animated Stories",
+]
+
+
 class ShortsGenerator:
     """Automated generator for 30-60 second Hindi Kids Cartoon YouTube Shorts."""
 
@@ -178,7 +192,7 @@ class ShortsGenerator:
                     break
 
         if not selected_key:
-            selected_key = random.choice(list(PRESET_TOPICS.keys()))
+            selected_key = random.choice(_PRESET_KEYS)
 
         preset = PRESET_TOPICS[selected_key]
         title = custom_title if custom_title else preset["title"]
@@ -189,20 +203,19 @@ class ShortsGenerator:
         num_scenes = len(raw_scenes)
         scene_duration = round(duration / num_scenes, 1)
 
-        scenes: List[Scene] = []
-        for idx, sdata in enumerate(raw_scenes, start=1):
-            scenes.append(
-                Scene(
-                    scene_number=idx,
-                    duration_seconds=scene_duration,
-                    visual_description=sdata["visual"],
-                    ai_video_prompt=sdata["ai_prompt"],
-                    voiceover_hindi=sdata["vo_hindi"],
-                    voiceover_english=sdata["vo_eng"],
-                    music_sfx=sdata["sfx"],
-                    subtitles=sdata["subtitles"]
-                )
+        scenes: List[Scene] = [
+            Scene(
+                scene_number=idx,
+                duration_seconds=scene_duration,
+                visual_description=sdata["visual"],
+                ai_video_prompt=sdata["ai_prompt"],
+                voiceover_hindi=sdata["vo_hindi"],
+                voiceover_english=sdata["vo_eng"],
+                music_sfx=sdata["sfx"],
+                subtitles=sdata["subtitles"]
             )
+            for idx, sdata in enumerate(raw_scenes, start=1)
+        ]
 
         main_char = characters[0].name if characters else "Cartoon Character"
         thumbnail_prompt = (
@@ -217,18 +230,7 @@ class ShortsGenerator:
             f"Subscribe to our channel for more cute 3D animated Hindi stories, fairy tales, and moral lessons every day! "
             f"#KidsCartoons #HindiKahaniya #MoralStories #Shorts #Animation #3DCartoon"
         )
-        seo_tags = [
-            "Kids Cartoons",
-            "Hindi Kahaniya",
-            "Moral Stories",
-            "YouTube Shorts",
-            "3D Animation",
-            "Educational Shorts",
-            "Bedtime Stories",
-            "Children Stories",
-            "Hindi Animated Stories",
-            selected_key.capitalize()
-        ]
+        seo_tags = _BASE_SEO_TAGS + [selected_key.capitalize()]
         cta = "👍 Like, Share, and Subscribe for more fun cartoon stories every day! 🔔 Press the bell icon!"
 
         return ShortsPackage(
